@@ -1,5 +1,14 @@
-import { useState } from "react";
-import { Search, ChevronDown } from "lucide-react";
+import { Search, ChevronDown, Settings, Sparkles } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface FilterBarProps {
   activeFilter: string;
@@ -10,7 +19,11 @@ interface FilterBarProps {
   onPromptToDeFiChange: (enabled: boolean) => void;
 }
 
-const filters = ["All", "Strategy", "Intelligence"];
+const filters = [
+  { label: "All", icon: null },
+  { label: "Strategy", icon: Settings },
+  { label: "Intelligence", icon: Sparkles },
+];
 
 export const FilterBar = ({
   activeFilter,
@@ -20,69 +33,70 @@ export const FilterBar = ({
   promptToDeFi,
   onPromptToDeFiChange,
 }: FilterBarProps) => {
-  const [chainDropdownOpen, setChainDropdownOpen] = useState(false);
-
   return (
     <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 py-6">
-      <div className="flex items-center gap-2 p-1 bg-secondary rounded-full">
+      <div className="flex items-center gap-1 p-1 bg-secondary rounded-lg">
         {filters.map((filter) => (
-          <button
-            key={filter}
-            onClick={() => onFilterChange(filter)}
-            className={`px-4 py-2 text-sm font-medium rounded-full transition-all duration-200 ${
-              activeFilter === filter
-                ? "bg-card text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+          <Button
+            key={filter.label}
+            variant={activeFilter === filter.label ? "default" : "ghost"}
+            size="sm"
+            onClick={() => onFilterChange(filter.label)}
+            className="gap-2"
           >
-            {filter === "Strategy" && "⚙️ "}
-            {filter === "Intelligence" && "✨ "}
-            {filter}
-          </button>
+            {filter.icon && <filter.icon size={14} />}
+            {filter.label}
+          </Button>
         ))}
       </div>
 
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-        <label className="flex items-center gap-3 cursor-pointer">
-          <span className="text-sm text-muted-foreground">✨ Prompt-to-DeFi supported</span>
-          <button
-            onClick={() => onPromptToDeFiChange(!promptToDeFi)}
-            className={`relative w-12 h-6 rounded-full transition-colors duration-200 ${
-              promptToDeFi ? "bg-primary" : "bg-secondary"
-            }`}
-          >
-            <span
-              className={`absolute top-1 w-4 h-4 rounded-full bg-foreground transition-transform duration-200 ${
-                promptToDeFi ? "left-7" : "left-1"
-              }`}
-            />
-          </button>
-        </label>
-
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
-          <input
-            type="text"
-            placeholder="Search agent"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full sm:w-64 pl-10 pr-4 py-2.5 bg-secondary rounded-lg border border-border/50 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 transition-colors"
+        <div className="flex items-center gap-3">
+          <Label htmlFor="prompt-defi" className="text-sm text-muted-foreground flex items-center gap-2">
+            <Sparkles size={14} />
+            Prompt-to-DeFi supported
+          </Label>
+          <Switch
+            id="prompt-defi"
+            checked={promptToDeFi}
+            onCheckedChange={onPromptToDeFiChange}
           />
         </div>
 
         <div className="relative">
-          <button
-            onClick={() => setChainDropdownOpen(!chainDropdownOpen)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-secondary rounded-lg border border-border/50 text-foreground hover:border-primary/30 transition-colors"
-          >
-            All Chains
-            <ChevronDown size={16} className="text-muted-foreground" />
-          </button>
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
+          <Input
+            type="text"
+            placeholder="Search agent"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            className="w-full sm:w-64 pl-9"
+          />
         </div>
 
-        <button className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2">
+              All Chains
+              <ChevronDown size={14} />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem>All Chains</DropdownMenuItem>
+            <DropdownMenuItem>Ethereum</DropdownMenuItem>
+            <DropdownMenuItem>Solana</DropdownMenuItem>
+            <DropdownMenuItem>Base</DropdownMenuItem>
+            <DropdownMenuItem>Arbitrum</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        <Button variant="ghost" size="sm" onClick={() => {
+          onFilterChange("All");
+          onSearchChange("");
+          onPromptToDeFiChange(false);
+        }}>
           Clear Filters
-        </button>
+        </Button>
       </div>
     </div>
   );
