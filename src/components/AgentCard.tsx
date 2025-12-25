@@ -1,4 +1,7 @@
-import { LucideIcon } from "lucide-react";
+import { LucideIcon, Settings, Sparkles } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface AgentCardProps {
   icon: LucideIcon;
@@ -10,11 +13,6 @@ interface AgentCardProps {
   hasPromptToDeFi?: boolean;
 }
 
-const tagStyles = {
-  strategy: "border-primary/50 text-primary",
-  intelligence: "border-accent/50 text-accent",
-};
-
 export const AgentCard = ({
   icon: Icon,
   name,
@@ -25,59 +23,60 @@ export const AgentCard = ({
   hasPromptToDeFi,
 }: AgentCardProps) => {
   return (
-    <div className="group relative bg-card rounded-xl border border-border/50 p-6 transition-all duration-300 hover:border-primary/30 hover:card-glow">
+    <Card className="group relative transition-all duration-300 hover:border-muted-foreground/30">
       {hasPromptToDeFi && (
         <div className="absolute top-4 right-4">
-          <span className="px-3 py-1.5 text-xs font-medium rounded-full bg-accent/20 text-accent border border-accent/30">
-            ✨ Prompt-to-DeFi
-          </span>
+          <Badge variant="secondary" className="gap-1">
+            <Sparkles size={12} />
+            Prompt-to-DeFi
+          </Badge>
         </div>
       )}
 
-      <div className="p-3 w-fit rounded-xl bg-secondary border border-border/50 mb-4">
-        <Icon size={24} className="text-foreground" />
-      </div>
+      <CardHeader className="pb-4">
+        <div className="p-3 w-fit rounded-lg bg-secondary mb-4">
+          <Icon size={24} className="text-foreground" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground">{name}</h3>
+      </CardHeader>
 
-      <h3 className="text-lg font-semibold text-foreground mb-4">{name}</h3>
+      <CardContent className="space-y-6">
+        <ul className="space-y-2">
+          {features.map((feature, index) => (
+            <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
+              <span className="text-muted-foreground mt-0.5">•</span>
+              {feature}
+            </li>
+          ))}
+        </ul>
 
-      <ul className="space-y-2 mb-6">
-        {features.map((feature, index) => (
-          <li key={index} className="flex items-start gap-2 text-sm text-muted-foreground">
-            <span className="text-primary mt-1">•</span>
-            {feature}
-          </li>
-        ))}
-      </ul>
+        <div className="flex flex-wrap gap-2">
+          {tags.map((tag, index) => (
+            <Badge key={index} variant="outline" className="gap-1">
+              {tag.type === "strategy" ? <Settings size={12} /> : <Sparkles size={12} />}
+              {tag.label}
+            </Badge>
+          ))}
+        </div>
 
-      <div className="flex flex-wrap gap-2 mb-6">
-        {tags.map((tag, index) => (
-          <span
-            key={index}
-            className={`px-3 py-1 text-xs font-medium rounded-full border ${tagStyles[tag.type]}`}
-          >
-            {tag.type === "strategy" ? "⚙️" : "✨"} {tag.label}
-          </span>
-        ))}
-      </div>
-
-      <div className="pt-4 border-t border-border/50">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">Supported Chains</span>
-          <div className="flex items-center gap-1">
-            {chains.map((chain, index) => (
-              <div
-                key={index}
-                className="w-6 h-6 rounded-full bg-secondary border border-border/50 flex items-center justify-center text-xs font-bold"
-              >
-                {chain[0]}
-              </div>
-            ))}
-            {extraChains && extraChains > 0 && (
-              <span className="text-xs text-muted-foreground ml-1">+{extraChains}</span>
-            )}
+        <div className="pt-4 border-t border-border">
+          <div className="flex items-center justify-between">
+            <span className="text-sm text-muted-foreground">Supported Chains</span>
+            <div className="flex items-center gap-1">
+              {chains.map((chain, index) => (
+                <Avatar key={index} className="h-6 w-6">
+                  <AvatarFallback className="text-xs font-medium bg-secondary">
+                    {chain[0]}
+                  </AvatarFallback>
+                </Avatar>
+              ))}
+              {extraChains && extraChains > 0 && (
+                <span className="text-xs text-muted-foreground ml-1">+{extraChains}</span>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
